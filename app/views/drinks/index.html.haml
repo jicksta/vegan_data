@@ -1,1 +1,32 @@
-%h1 Hello world!
+%h1 What hath God wrought?!
+
+= javascript_include_tag "http://documentcloud.github.com/underscore/underscore-min.js"
+
+= form_tag search_drinks_path, :method => :get do
+  = search_field_tag "q", "", :id => "search_field"
+  = submit_tag
+
+%ul#container
+  - for company in @companies
+    - for product in company.products
+      %li.item
+        %span.company-name= company.company_name
+        %span.product-name= product.product_name
+
+:javascript
+  var KEY_TIMEOUT = 400; // ms
+  $(function() {
+    var container = $("#container"), searchField = $("#search_field");
+    var listItems = container.find("li");
+    searchField.keyup(_.debounce(function() {
+      var query = searchField.val().toLowerCase();
+      listItems.each(function() {
+        var self = $(this);
+        if(self.text().toLowerCase().indexOf(query) >= 0) {
+          self.show()
+        } else {
+          self.hide();
+        }
+      });
+    }, KEY_TIMEOUT));
+  });
